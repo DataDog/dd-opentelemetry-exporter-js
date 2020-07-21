@@ -20,8 +20,10 @@ The OpenTelemetry Datadog Trace Exporter requires a Datadog Agent that it can se
 
 ## Installation
 
+To Install directly from Github
+
 ```bash
-npm install --save @opentelemetry/exporter-datadog
+npm install --save DataDog/dd-opentelemetry-exporter-js
 ```
 
 ## Usage
