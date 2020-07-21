@@ -10,9 +10,6 @@ node_unit_tests: &node_unit_tests
         name: Install Root Dependencies
         command: npm install --ignore-scripts
     - run:
-        name: Boostrap dependencies
-        command: npx lerna bootstrap --no-ci
-    - run:
         name: Unit tests
         command: npm run test
 
