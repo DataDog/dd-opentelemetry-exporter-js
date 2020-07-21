@@ -20,7 +20,13 @@ The OpenTelemetry Datadog Trace Exporter requires a Datadog Agent that it can se
 
 ## Installation
 
-To Install directly from Github
+To install:
+
+```bash
+npm install --save opentelemetry-exporter-datadog
+```
+
+Alternatively, to install directly from Github:
 
 ```bash
 npm install --save DataDog/dd-opentelemetry-exporter-js
@@ -36,7 +42,7 @@ set, the value set by the option in code is authoritative.
 
 ```js
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { DatadogSpanProcessor, DatadogExporter, DatadogPropagator, DatadogProbabilitySampler } from '@opentelemetry/exporter-datadog';
+import { DatadogSpanProcessor, DatadogExporter, DatadogPropagator, DatadogProbabilitySampler } from 'opentelemetry-exporter-datadog';
 
 const provider = new NodeTracerProvider();
 
