@@ -18,7 +18,7 @@ export class DatadogProbabilitySampler implements Sampler {
     this._probability = this._normalize(_probability);
   }
 
-  shouldSample(parentContext?: SpanContext) {
+  shouldSample(parentContext?: SpanContext): any {
     // Respect the parent sampling decision if there is one
     if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
       return {

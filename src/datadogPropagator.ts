@@ -38,7 +38,7 @@ function isValidSpanId(spanId: string): boolean {
  * Based on: https://github.com/DataDog/dd-trace-js/blob/master/packages/dd-trace/src/opentracing/propagation/text_map.js
  */
 export class DatadogPropagator implements HttpTextPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: SetterFunction): void {
     const spanContext = getParentSpanContext(context);
 
     if (!spanContext) return;

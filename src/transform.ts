@@ -67,7 +67,7 @@ export function translateToDatadog(
 function createSpan(
   span: ReadableSpan,
   serviceName: string,
-  tags: object,
+  tags: unknown,
   env?: string,
   version?: string
 ): typeof Span {
@@ -205,7 +205,7 @@ function getTraceContext(span: ReadableSpan): typeof Span[] {
   ];
 }
 
-function createDefaultTags(tags: string | undefined): object {
+function createDefaultTags(tags: string | undefined): unknown {
   // Parse a string of tags typically provided via environment variables.
   // The expected string is of the form: "key1:value1,key2:value2"
   const tagMap: { [key: string]: string } = {};
@@ -265,7 +265,7 @@ function createResource(span: ReadableSpan): string {
   return span.name;
 }
 
-function getInstrumentationName(span: ReadableSpan): string | undefined {
+function getInstrumentationName(span: any): string | undefined {
   return span.instrumentationLibrary && span.instrumentationLibrary.name;
 }
 

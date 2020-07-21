@@ -6,7 +6,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ReadableSpan } from '@opentelemetry/tracing';
+// import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { TraceState } from '@opentelemetry/core';
 
@@ -29,7 +29,7 @@ export const mockSpanContextOrigin = {
   traceState: new TraceState('dd_origin=synthetics-example'),
 };
 
-export const mockReadableSpan: ReadableSpan = {
+export const mockReadableSpan: any = {
   name: 'my-span1',
   kind: api.SpanKind.CLIENT,
   spanContext: mockSpanContextUnsampled,
@@ -50,7 +50,7 @@ export const mockReadableSpan: ReadableSpan = {
   },
 };
 
-export const mockExandedReadableSpan: ReadableSpan = {
+export const mockExandedReadableSpan: any = {
   name: 'my-span',
   kind: api.SpanKind.INTERNAL,
   spanContext: mockSpanContextUnsampled,
