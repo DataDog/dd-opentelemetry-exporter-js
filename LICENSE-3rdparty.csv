@@ -1,0 +1,27 @@
+Component,Origin,License,Copyright
+require,@opentelemetry/api,Apache-2.0,Copyright 2020 OpenTelemetry Authors
+require,@opentelemetry/core,Apache-2.0,Copyright 2020 OpenTelemetry Authors
+require,@opentelemetry/resources,Apache-2.0,Copyright 2020 OpenTelemetry Authors
+require,@opentelemetry/tracing,Apache-2.0,Copyright 2020 OpenTelemetry Authors
+dev,@opentelemetry/resources,Apache-2.0,Copyright 2020 OpenTelemetry Authors
+dev,@types/mocha,MIT,Copyright Authors
+dev,@types/node,MIT,Copyright Authors
+dev,@types/sinon,MIT,Copyright Authors
+dev,@typescript-eslint/eslint-plugin,MIT,Copyright JS Foundation and other contributors https://js.foundation
+dev,@typescript-eslint/parse,MIT,Copyright JS Foundation and other contributors https://js.foundation
+dev,benchmark,MIT,Copyright 2010-2016 Mathias Bynens Robert Kieffer John-David Dalton
+dev,codecov,MIT,Copyright 2014 Gregg Caines
+dev,eslint,MIT,Copyright JS Foundation and other contributors https://js.foundation
+dev,eslint-config-airbnb-base,MIT,Copyright (c) 2012 Airbnb
+dev,eslint-plugin-header,MIT,Stuart Knightley
+dev,eslint-plugin-import,MIT,Copyright 2015 Ben Mosher
+dev,gts,Apache-2.0,Copyright 2018 Google Inc.
+dev,husky,MIT,Copyright (c) 2017
+dev,mocha,MIT,Copyright 2011-2018 JS Foundation and contributors https://js.foundation
+dev,nock,MIT,Copyright 2017 Pedro Teixeira and other contributors
+dev,nyc,ISC,Copyright 2015 Contributors
+dev,rimraf,ISC,Copyright Isaac Z. Schlueter and Contributors
+dev,sinon,BSD-3-Clause,Copyright 2010-2017 Christian Johansen
+dev,ts-mocha,MIT,Copyright (c) 2016-2018 Piotr Witek
+dev,ts-node,MIT,Copyright (c) 2014 Blake Embrey
+dev,typescript,Apache-2.0,Copyright (c) Microsoft Corporation
