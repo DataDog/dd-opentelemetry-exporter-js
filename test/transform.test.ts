@@ -150,7 +150,7 @@ describe('transform', () => {
       const spans = generateOtelSpans({
         spanContext: spanContextSampled,
         attributes: {
-          'http.route': '/v0.4/traces/',
+          'http.target': '/v0.4/traces/',
         },
       });
       const datadogSpans = translateToDatadog(spans, serviceName);

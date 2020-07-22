@@ -303,8 +303,8 @@ function inferErrorType(span: ReadableSpan): unknown {
 }
 
 function isInternalRequest(span: ReadableSpan): boolean | void {
-  if (typeof span.attributes['http.route'] === 'string') {
-    return span.attributes['http.route'].match(INTERNAL_TRACE_REGEX)
+  if (typeof span.attributes['http.target'] === 'string') {
+    return span.attributes['http.target'].match(INTERNAL_TRACE_REGEX)
       ? true
       : false;
   }
