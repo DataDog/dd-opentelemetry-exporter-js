@@ -4,10 +4,6 @@
 
 **[BETA]**
 
-[![Gitter chat][gitter-image]][gitter-url]
-[![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 OpenTelemetry Datadog Trace Exporter allows the user to send collected traces to a Datadog Trace-Agent.
@@ -172,9 +168,3 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/DatadDog/dd-opentelemetry-exporter-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-datadog
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-datadog
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-datadog
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-datadog&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-datadog
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-datadog.svg
