@@ -26,7 +26,7 @@ npm install --save opentelemetry-exporter-datadog
 
 Install the datadog processor and datadog exporter on your application and pass the options. It should contain a service name (default is `dd-service`).
 
-Furthermore, the `agent_url` option (which defaults to `http://localhost:8126`), can instead be set by the
+Furthermore, the `agentUrl` option (which defaults to `http://localhost:8126`), can instead be set by the
 `DD_TRACE_AGENT_URL` environment variable to reduce in-code config. If both are
 set, the value set by the option in code is authoritative.
 
@@ -37,8 +37,8 @@ import { DatadogSpanProcessor, DatadogExporter, DatadogPropagator, DatadogProbab
 const provider = new NodeTracerProvider();
 
 const exporterOptions = {
-  service_name: 'my-service', // optional
-  agent_url: 'http://localhost:8126' // optional
+  serviceName: 'my-service', // optional
+  agentUrl: 'http://localhost:8126' // optional
   tags: 'example_key:example_value,example_key_two:value_two', // optional
   env: 'production', // optional
   version: '1.0' // optional
@@ -116,7 +116,7 @@ These values can also be overridden at the trace exporter level:
 
 ```js
 // Configure the datadog trace agent url
-new DatadogExporter({agent_url: 'http://dd-agent:8126'});
+new DatadogExporter({agentUrl: 'http://dd-agent:8126'});
 ```
 
 ### Configuration Options - Tagging
@@ -135,8 +135,8 @@ These values can also be overridden at the trace exporter level:
 ```js
 
 new DatadogExporter({
-  service_name: 'my-service', // optional
-  agent_url: 'http://localhost:8126' // optional
+  serviceName: 'my-service', // optional
+  agentUrl: 'http://localhost:8126' // optional
   tags: 'example_key:example_value,example_key_two:value_two', // optional
   env: 'production', // optional
   version: '1.1' // optional
