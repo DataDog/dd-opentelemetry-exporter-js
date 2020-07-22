@@ -12,7 +12,7 @@ OpenTelemetry Datadog Trace Exporter allows the user to send collected traces to
 
 ## Prerequisites
 
-The OpenTelemetry Datadog Trace Exporter requires a Datadog Agent that it can send exported traces to. This Agent then forwards those traces to a Datadog API intake endpoint. To get up and running with Datadog in your environment follow the Getting Started Instructions for Installing and configuring a [Datadog Agent](https://docs.datadoghq.com/tracing/#1-configure-the-datadog-agenthttps://docs.datadoghq.com/tracing/#1-configure-the-datadog-agent) which the exporter can send traces to. By Default the Agent listens for Traces at `localhost:8126`.
+The OpenTelemetry Datadog Trace Exporter requires a Datadog Agent that it can send exported traces to. This Agent then forwards those traces to a Datadog API intake endpoint. To get up and running with Datadog in your environment follow the Getting Started Instructions for Installing and configuring a [Datadog Agent](https://docs.datadoghq.com/tracing/#1-configure-the-datadog-agenthttps://docs.datadoghq.com/tracing/#1-configure-the-datadog-agent) which the exporter can send traces to. By default, the Agent listens for Traces at `localhost:8126`.
 
 ## Installation
 
@@ -20,12 +20,6 @@ To install:
 
 ```bash
 npm install --save opentelemetry-exporter-datadog
-```
-
-Alternatively, to install directly from Github:
-
-```bash
-npm install --save DataDog/dd-opentelemetry-exporter-js
 ```
 
 ## Usage
