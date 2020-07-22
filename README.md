@@ -98,7 +98,7 @@ const provider = new NodeTracerProvider();
 // ... provider setup with appropriate exporter
 
 provider.register({
-  propagator: new DaCompositePropagator({
+  propagator: new CompositePropagator({
     propagators: [new B3Propagator(), new DatadogPropagator()]
   }),
 });
