@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.2] - 2020-07-30
+### Fixed
+- fix filtering of internal requests to trace agent
+
 ## [0.1.1] - 2020-07-22
 ### Fixed
 - fix readme
