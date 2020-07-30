@@ -323,6 +323,9 @@ function setSamplingRate(ddSpanBase: typeof Span, span: ReadableSpan): void {
   const internalRequest = isInternalRequest(span);
 
   if (internalRequest) {
+    // TODO: add more robust way to drop internal requests
+    ddSpanBase.context()._traceFlags.sampled = false;
+    ddSpanBase.context()._sampling.priority = DatadogSamplingCodes.USER_REJECT;
     ddSpanBase.setTag(
       DatadogDefaults.SAMPLE_RATE_METRIC_KEY,
       DatadogSamplingCodes.USER_REJECT
