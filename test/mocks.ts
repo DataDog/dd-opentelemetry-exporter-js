@@ -10,6 +10,8 @@ import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { TraceState } from '@opentelemetry/core';
 
+export const mockResourceServiceName = 'otel-resource-service-name';
+
 export const mockSpanContextUnsampled = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
@@ -89,8 +91,57 @@ export const mockExandedReadableSpan: any = {
   ],
   duration: [32, 800000000],
   resource: new Resource({
-    service: 'ui',
-    version: 1,
+    zervice: 'ui',
+    otherInfo: 'one',
+    cost: 112.12,
+  }),
+  instrumentationLibrary: {
+    name: 'default',
+    version: '0.0.1',
+  },
+};
+
+export const mockExandedReadableSpanWithResourceService: any = {
+  name: 'my-span',
+  kind: api.SpanKind.INTERNAL,
+  spanContext: mockSpanContextUnsampled,
+  startTime: [1566156729, 709],
+  endTime: [1566156731, 709],
+  ended: true,
+  status: {
+    code: api.CanonicalCode.OK,
+  },
+  attributes: {
+    testBool: true,
+    testString: 'test',
+    testNum: '3.142',
+  },
+  links: [
+    {
+      context: {
+        traceId: 'a4cda95b652f4a1592b449d5929fda1b',
+        spanId: '3e0c63257de34c92',
+      },
+      attributes: {
+        testBool: true,
+        testString: 'test',
+        testNum: 3.142,
+      },
+    },
+  ],
+  events: [
+    {
+      name: 'something happened',
+      attributes: {
+        error: true,
+      },
+      time: [1566156729, 809],
+    },
+  ],
+  duration: [32, 800000000],
+  resource: new Resource({
+    'service.name': mockResourceServiceName,
+    otherInfo: 'one',
     cost: 112.12,
   }),
   instrumentationLibrary: {

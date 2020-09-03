@@ -73,11 +73,12 @@ function createSpan(
 ): typeof Span {
   // convert to datadog span
   const [ddTraceId, ddSpanId, ddParentId] = getTraceContext(span);
+  const [ddResourceTags, ddResourceServiceName] = getResourceInfo(span);
 
   // generate datadog span base
   const ddSpanBase = new Span(NOOP_TRACER, null, SAMPLER, null, {
     startTime: hrTimeToMilliseconds(span.startTime),
-    tags: tags,
+    tags: Object.assign(tags, ddResourceTags),
     operationName: createSpanName(span),
   });
   const ddSpanBaseContext = ddSpanBase.context();
@@ -95,7 +96,14 @@ function createSpan(
   addSpanType(ddSpanBase, span);
 
   // set datadog specific env and version tags
-  addDatadogTags(ddSpanBase, span, serviceName, env, version);
+  addDatadogTags(
+    ddSpanBase,
+    span,
+    serviceName,
+    env,
+    version,
+    ddResourceServiceName
+  );
 
   // set sampling rate
   setSamplingRate(ddSpanBase, span);
@@ -164,12 +172,13 @@ function addDatadogTags(
   span: ReadableSpan,
   serviceName?: string | undefined,
   env?: string | undefined,
-  version?: string | undefined
+  version?: string | undefined,
+  ddResourceServiceName?: string | undefined
 ): void {
   // set reserved service and resource tags
   ddSpanBase.addTags({
     [DatadogDefaults.RESOURCE_TAG]: createResource(span),
-    [DatadogDefaults.SERVICE_TAG]: serviceName,
+    [DatadogDefaults.SERVICE_TAG]: ddResourceServiceName || serviceName,
   });
 
   // set env tag
@@ -333,4 +342,29 @@ function setSamplingRate(ddSpanBase: typeof Span, span: ReadableSpan): void {
   } else if (samplingRate !== undefined) {
     ddSpanBase.setTag(DatadogDefaults.SAMPLE_RATE_METRIC_KEY, samplingRate);
   }
+}
+
+function getResourceInfo(span: ReadableSpan): any[] {
+  // extract the resource labels/attributes and potential service name to use for spans
+  const ddResourceTags: { [key: string]: any } = {};
+  let resourceServiceName: any;
+  const resource: any = span.resource;
+
+  if (!resource) return [ddResourceTags, resourceServiceName];
+
+  const resourceTags: { [key: string]: string | number } | undefined =
+    resource['labels'] || resource['attributes'];
+
+  if (!resourceTags) return [ddResourceTags, resourceServiceName];
+
+  // the spec around whether this is labels or attributes varies between versions
+  for (const [key, value] of Object.entries(resourceTags)) {
+    if (key === 'service.name') {
+      resourceServiceName = value.toString();
+    } else {
+      ddResourceTags[key] = value.toString();
+    }
+  }
+
+  return [ddResourceTags, resourceServiceName];
 }
