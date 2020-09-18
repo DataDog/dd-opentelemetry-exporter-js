@@ -16,6 +16,8 @@ import {
   mockSpanContextSampled,
   mockSpanContextOrigin,
   mockExandedReadableSpan,
+  mockExandedReadableSpanWithResourceService,
+  mockResourceServiceName,
 } from './mocks';
 
 describe('transform', () => {
@@ -36,8 +38,18 @@ describe('transform', () => {
     return otelSpans;
   };
 
+  const generateOtelSpansWithResourceService = function (
+    options: any
+  ): ReadableSpan[] {
+    const otelSpans = [];
+    const span: ReadableSpan = mockExandedReadableSpanWithResourceService;
+    const updatedSpan = Object.assign(span, options);
+    otelSpans.push(updatedSpan);
+    return otelSpans;
+  };
+
   describe('translateToDatadog', () => {
-    it('should convert an OpenTelemetry span and its properties to a finished DatadogSpan', () => {
+    it('should convert an OpenTelemetry span and its properties, including resource info, to a finished DatadogSpan', () => {
       const spans = generateOtelSpans({ spanContext: spanContextUnsampled });
       const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
@@ -66,7 +78,8 @@ describe('transform', () => {
         datadogSpan.start,
         Math.round(hrTimeToMilliseconds(spans[0].startTime) * 1e6)
       );
-      assert.strictEqual(Object.keys(datadogSpan.meta).length, 4);
+
+      assert.strictEqual(Object.keys(datadogSpan.meta).length, 7);
       assert.strictEqual(Object.keys(datadogSpan.metrics).length, 1);
       assert.strictEqual(
         datadogSpan.metrics['_sample_rate'],
@@ -156,6 +169,15 @@ describe('transform', () => {
       const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
       assert.strictEqual(datadogSpan.metrics['_sample_rate'], -1);
+    });
+
+    it('should set the resource service.name as dd span service if it exists', () => {
+      const spans = generateOtelSpansWithResourceService({
+        spanContext: spanContextSampled,
+      });
+      const datadogSpans = translateToDatadog(spans, serviceName);
+      const datadogSpan = datadogSpans[0];
+      assert.strictEqual(datadogSpan.service, mockResourceServiceName);
     });
   });
 });
