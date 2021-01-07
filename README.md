@@ -38,7 +38,7 @@ const provider = new NodeTracerProvider();
 
 const exporterOptions = {
   serviceName: 'my-service', // optional
-  agentUrl: 'http://localhost:8126' // optional
+  agentUrl: 'http://localhost:8126', // optional
   tags: 'example_key:example_value,example_key_two:value_two', // optional
   env: 'production', // optional
   version: '1.0' // optional
