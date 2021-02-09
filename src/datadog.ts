@@ -6,7 +6,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { translateToDatadog } from './transform';
 import { AgentExporter, PrioritySampler, DatadogExporterConfig } from './types';
@@ -25,6 +25,7 @@ export class DatadogExporter implements SpanExporter {
   private _tags: string | undefined;
   private _url: string;
   private _flushInterval: number;
+  private _isShutdown: boolean;
 
   constructor(config: DatadogExporterConfig = {}) {
     this._url =
@@ -46,6 +47,7 @@ export class DatadogExporter implements SpanExporter {
       { url: new URL(this._url), flushInterval: this._flushInterval },
       new PrioritySampler()
     );
+    this._isShutdown = false;
   }
 
   /**
@@ -56,6 +58,16 @@ export class DatadogExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
+    if (this._isShutdown) {
+      setTimeout(() =>
+        resultCallback({
+          code: ExportResultCode.FAILED,
+          error: new Error('Exporter has been shutdown'),
+        })
+      );
+      return;
+    }
+
     if (spans.length === 0) {
       return resultCallback(ExportResult.SUCCESS);
     }

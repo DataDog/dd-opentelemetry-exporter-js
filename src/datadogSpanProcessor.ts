@@ -5,13 +5,13 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import { unrefTimer, NoopLogger } from '@opentelemetry/core';
+import { globalErrorHandler, unrefTimer, NoopLogger } from '@opentelemetry/core';
 import {
   SpanProcessor,
   SpanExporter,
   ReadableSpan,
 } from '@opentelemetry/tracing';
-import { Logger } from '@opentelemetry/api';
+import { context, Logger, suppressInstrumentation } from '@opentelemetry/api';
 import { id, DatadogBufferConfig } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;
@@ -30,6 +30,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
   private readonly _maxQueueSize: number;
   private readonly _maxTraceSize: number;
   private _isShutdown = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
   // private _exporter: SpanExporter;
   private _timer: NodeJS.Timeout | undefined;
   private _traces = new Map();
@@ -58,20 +59,34 @@ export class DatadogSpanProcessor implements SpanProcessor {
         : DEFAULT_MAX_TRACE_SIZE;
   }
 
-  forceFlush(): void {
+  forceFlush(): Promise<void> {
     if (this._isShutdown) {
-      return;
+      return this._shuttingDownPromise;
     }
-    this._flush();
+    return this._flush();
   }
 
-  shutdown(): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
-      return;
+      return this._shuttingDownPromise;
     }
-    this.forceFlush();
-    this._isShutdown = true;
-    this._exporter.shutdown();
+    this._isShutdown = true; 
+
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this._flush();
+        })
+        .then(() => {
+          return this._exporter.shutdown();
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+
+    return this._shuttingDownPromise;
   }
 
   // adds span to queue.
@@ -155,22 +170,30 @@ export class DatadogSpanProcessor implements SpanProcessor {
   }
 
   /** Send the span data list to exporter */
-  private _flush() {
+  private _flush(): Promise<void> {
     this._clearTimer();
-    if (this._checkTracesQueue.size === 0) return;
+    if (this._checkTracesQueue.size === 0) return Promise.resolve();
 
-    this._checkTracesQueue.forEach(traceId => {
-      // check again in case spans have been added
-      if (this._isExportable(traceId)) {
-        const spans = this._traces.get(traceId);
-        this._traces.delete(traceId);
-        this._tracesSpansStarted.delete(traceId);
-        this._tracesSpansFinished.delete(traceId);
-        this._checkTracesQueue.delete(traceId);
-        this._exporter.export(spans, () => {});
-      } else {
-        this.logger.error(`Trace  ${traceId} incomplete, not exported`);
-      }
+    return new Promise((resolve, reject) => {
+      // prevent downstream exporter calls from generating spans
+      context.with(suppressInstrumentation(context.active()), () => {
+
+        this._checkTracesQueue.forEach(traceId => {
+          // check again in case spans have been added
+          if (this._isExportable(traceId)) {
+            const spans = this._traces.get(traceId);
+            this._traces.delete(traceId);
+            this._tracesSpansStarted.delete(traceId);
+            this._tracesSpansFinished.delete(traceId);
+            this._checkTracesQueue.delete(traceId);
+            this._exporter.export(spans, () => {});
+          } else {
+            this.logger.error(`Trace  ${traceId} incomplete, not exported`);
+          }
+        });
+
+        resolve();
+      });
     });
   }
 
@@ -178,7 +201,9 @@ export class DatadogSpanProcessor implements SpanProcessor {
     if (this._timer !== undefined) return;
 
     this._timer = setTimeout(() => {
-      this._flush();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }, this._bufferTimeout);
     unrefTimer(this._timer);
   }
