@@ -127,11 +127,11 @@ function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
     ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, DatadogDefaults.ERROR);
     ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
 
-    if (possibleType) {
+    if (possibleType && possibleType > 1) {
       ddSpanBase.setTag(DatadogDefaults.ERROR_TYPE_TAG, possibleType);
     }
   }
-  if (span.status && span.status.code && span.status.code > 0) {
+  if (span.status && span.status.code && span.status.code > 1) {
     // TODO: set error.msg error.type error.stack based on error events
     // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
     // the type and stacktrace are not officially recorded. Until this implemented,

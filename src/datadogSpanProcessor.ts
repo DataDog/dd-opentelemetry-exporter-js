@@ -177,7 +177,6 @@ export class DatadogSpanProcessor implements SpanProcessor {
     return new Promise((resolve, reject) => {
       // prevent downstream exporter calls from generating spans
       context.with(suppressInstrumentation(context.active()), () => {
-
         this._checkTracesQueue.forEach(traceId => {
           // check again in case spans have been added
           if (this._isExportable(traceId)) {

@@ -156,7 +156,7 @@ describe('transform', () => {
 
       assert.strictEqual(datadogSpan.error, 1);
       assert.strictEqual(datadogSpan.meta['error.msg'], 'error message');
-      assert.strictEqual(datadogSpan.meta['error.type'], 'NOT_FOUND');
+      assert.strictEqual(datadogSpan.meta['error.type'], 'ERROR');
     });
 
     it('should set the sampling rate to -1 for internally generated traces', () => {
