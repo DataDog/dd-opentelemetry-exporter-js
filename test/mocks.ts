@@ -5,7 +5,7 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import * as api from '@opentelemetry/api';
+import { SpanKind, StatusCode, TraceFlags } from '@opentelemetry/api';
 // import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { TraceState } from '@opentelemetry/core';
@@ -15,31 +15,31 @@ export const mockResourceServiceName = 'otel-resource-service-name';
 export const mockSpanContextUnsampled = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
-  traceFlags: api.TraceFlags.NONE,
+  traceFlags: TraceFlags.NONE,
 };
 
 export const mockSpanContextSampled = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
-  traceFlags: api.TraceFlags.SAMPLED,
+  traceFlags: TraceFlags.SAMPLED,
 };
 
 export const mockSpanContextOrigin = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
-  traceFlags: api.TraceFlags.SAMPLED,
+  traceFlags: TraceFlags.SAMPLED,
   traceState: new TraceState('dd_origin=synthetics-example'),
 };
 
 export const mockReadableSpan: any = {
   name: 'my-span1',
-  kind: api.SpanKind.CLIENT,
+  kind: SpanKind.CLIENT,
   spanContext: mockSpanContextUnsampled,
   startTime: [1566156729, 709],
   endTime: [1566156731, 709],
   ended: true,
   status: {
-    code: api.CanonicalCode.DATA_LOSS,
+    code: StatusCode.ERROR,
   },
   attributes: {},
   links: [],
@@ -54,13 +54,13 @@ export const mockReadableSpan: any = {
 
 export const mockExandedReadableSpan: any = {
   name: 'my-span',
-  kind: api.SpanKind.INTERNAL,
+  kind: SpanKind.INTERNAL,
   spanContext: mockSpanContextUnsampled,
   startTime: [1566156729, 709],
   endTime: [1566156731, 709],
   ended: true,
   status: {
-    code: api.CanonicalCode.OK,
+    code: StatusCode.OK,
   },
   attributes: {
     testBool: true,
@@ -103,13 +103,13 @@ export const mockExandedReadableSpan: any = {
 
 export const mockExandedReadableSpanWithResourceService: any = {
   name: 'my-span',
-  kind: api.SpanKind.INTERNAL,
+  kind: SpanKind.INTERNAL,
   spanContext: mockSpanContextUnsampled,
   startTime: [1566156729, 709],
   endTime: [1566156731, 709],
   ended: true,
   status: {
-    code: api.CanonicalCode.OK,
+    code: StatusCode.OK,
   },
   attributes: {
     testBool: true,

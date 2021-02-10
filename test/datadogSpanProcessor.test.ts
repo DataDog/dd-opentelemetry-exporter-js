@@ -5,7 +5,7 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import { TraceFlags } from '@opentelemetry/api';
+import { TraceFlags, setSpanContext, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   InMemorySpanExporter,
   BasicTracerProvider,
@@ -20,13 +20,13 @@ function createSampledSpan(spanName: string, parent?: boolean): Span {
     sampler: DATADOG_ALWAYS_SAMPLER,
   }).getTracer('default');
   const span = parent
-    ? tracer.startSpan(spanName, {
-        parent: {
+    ? tracer.startSpan(spanName, {},
+        setSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.SAMPLED,
-        },
-      })
+        })
+      )
     : tracer.startSpan(spanName);
 
   span.end();
