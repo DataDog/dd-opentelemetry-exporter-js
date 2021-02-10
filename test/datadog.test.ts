@@ -7,7 +7,7 @@
 
 import * as assert from 'assert';
 import { DatadogExporter } from '../src';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { AgentExporter } from '../src/types';
 import { mockReadableSpan } from './mocks';
 import * as nock from 'nock';
@@ -146,7 +146,7 @@ describe('DatadogExporter', () => {
 
       exporter.export([], (result: ExportResult) => {
         setTimeout(() => {
-          assert.strictEqual(result, ExportResult.SUCCESS);
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
           assert(scope.isDone() === false);
           nock.cleanAll();
           done();
@@ -163,7 +163,7 @@ describe('DatadogExporter', () => {
 
       exporter.export([readableSpan], (result: ExportResult) => {
         setTimeout(() => {
-          assert.strictEqual(result, ExportResult.SUCCESS);
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
           assert(scope.isDone());
           done();
         }, 200);
@@ -179,7 +179,7 @@ describe('DatadogExporter', () => {
 
       exporter.export([readableSpan], (result: ExportResult) => {
         setTimeout(() => {
-          assert.strictEqual(result, ExportResult.SUCCESS);
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
           assert(scope.isDone());
           done();
         }, 200);

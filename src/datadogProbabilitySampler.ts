@@ -7,9 +7,8 @@
 
 import {
   Sampler,
-  SpanContext,
-  TraceFlags,
   SamplingDecision,
+  SamplingResult
 } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces but records all traces. */
@@ -18,16 +17,7 @@ export class DatadogProbabilitySampler implements Sampler {
     this._probability = this._normalize(_probability);
   }
 
-  shouldSample(parentContext?: SpanContext): any {
-    // Respect the parent sampling decision if there is one
-    if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
-      return {
-        decision:
-          (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
-            ? SamplingDecision.RECORD_AND_SAMPLED
-            : SamplingDecision.RECORD,
-      };
-    }
+  shouldSample(context?: unknown): SamplingResult {
     return {
       decision:
         Math.random() < this._probability

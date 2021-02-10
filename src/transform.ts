@@ -5,7 +5,7 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import { SpanKind, TraceFlags, CanonicalCode } from '@opentelemetry/api';
+import { SpanKind, TraceFlags, StatusCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { id, format, Span, Sampler, NoopTracer } from './types';
@@ -290,11 +290,11 @@ function getSamplingRate(span: ReadableSpan): number {
 }
 
 // hacky way to get a valid error type
-// get canonicalCode key string
+// get StatusCode key string
 // then check if `<library>.error_name` attribute exists
 function inferErrorType(span: ReadableSpan): unknown {
   let typeName = undefined;
-  for (const [key, value] of Object.entries(CanonicalCode)) {
+  for (const [key, value] of Object.entries(StatusCode)) {
     if (span.status.code === value) {
       typeName = key.toString();
       break;

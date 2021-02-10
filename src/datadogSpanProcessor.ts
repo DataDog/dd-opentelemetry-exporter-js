@@ -5,13 +5,13 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import { globalErrorHandler, unrefTimer, NoopLogger } from '@opentelemetry/core';
+import { globalErrorHandler, unrefTimer } from '@opentelemetry/core';
 import {
   SpanProcessor,
   SpanExporter,
   ReadableSpan,
 } from '@opentelemetry/tracing';
-import { context, Logger, suppressInstrumentation } from '@opentelemetry/api';
+import { context, Logger, suppressInstrumentation, NoopLogger } from '@opentelemetry/api';
 import { id, DatadogBufferConfig } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;

@@ -6,7 +6,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, NoopLogger } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { translateToDatadog } from './transform';
 import { AgentExporter, PrioritySampler, DatadogExporterConfig } from './types';
@@ -32,7 +32,7 @@ export class DatadogExporter implements SpanExporter {
       config.agentUrl ||
       process.env.DD_TRACE_AGENT_URL ||
       DatadogExportDefaults.AGENT_URL;
-    this._logger = config.logger || new NoopLogger();
+    this._logger = config.logger || new api.NoopLogger();
     this._serviceName =
       config.serviceName ||
       process.env.DD_SERVICE ||
@@ -69,7 +69,7 @@ export class DatadogExporter implements SpanExporter {
     }
 
     if (spans.length === 0) {
-      return resultCallback(ExportResult.SUCCESS);
+      return resultCallback({ code: ExportResultCode.SUCCESS });
     }
 
     const formattedDatadogSpans = translateToDatadog(
@@ -82,17 +82,21 @@ export class DatadogExporter implements SpanExporter {
 
     try {
       this._exporter.export(formattedDatadogSpans);
-      return resultCallback(ExportResult.SUCCESS);
+      return resultCallback({ code: ExportResultCode.SUCCESS });
     } catch (error) {
       this._logger.debug(error);
-      return resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+      return resultCallback({ code: ExportResultCode.FAILED });
     }
   }
 
   /** Stops the exporter. */
-  shutdown(): void {
-    if (this._exporter._scheduler !== undefined) {
-      this._exporter._scheduler.stop();
-    }
+  shutdown(): Promise<void> {
+    this._isShutdown = true;
+    return new Promise((resolve, reject) => {
+      if (this._exporter._scheduler !== undefined) {
+        this._exporter._scheduler.stop();
+      }
+      resolve();
+    })
   }
 }

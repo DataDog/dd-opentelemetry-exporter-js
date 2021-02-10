@@ -7,17 +7,15 @@
 
 import {
   Context,
-  GetterFunction,
-  HttpTextPropagator,
-  SetterFunction,
+  getSpanContext,
+  setSpanContext,
+  isSpanContextValid,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
   TraceFlags,
-  SpanContext,
 } from '@opentelemetry/api';
-import {
-  getParentSpanContext,
-  setExtractedSpanContext,
-  TraceState,
-} from '@opentelemetry/core';
+import { TraceState }from '@opentelemetry/core';
 import { id } from './types';
 import { DatadogPropagationDefaults, DatadogDefaults } from './defaults';
 
@@ -37,11 +35,11 @@ function isValidSpanId(spanId: string): boolean {
  * Propagator for the Datadog HTTP header format.
  * Based on: https://github.com/DataDog/dd-trace-js/blob/master/packages/dd-trace/src/opentracing/propagation/text_map.js
  */
-export class DatadogPropagator implements HttpTextPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction): void {
-    const spanContext = getParentSpanContext(context);
+export class DatadogPropagator implements TextMapPropagator {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
+    const spanContext = getSpanContext(context);
 
-    if (!spanContext) return;
+    if (!spanContext || !isSpanContextValid(spanContext)) return;
 
     if (
       isValidTraceId(spanContext.traceId) &&
@@ -50,11 +48,11 @@ export class DatadogPropagator implements HttpTextPropagator {
       const ddTraceId = id(spanContext.traceId).toString(10);
       const ddSpanId = id(spanContext.spanId).toString(10);
 
-      setter(carrier, DatadogPropagationDefaults.X_DD_TRACE_ID, ddTraceId);
-      setter(carrier, DatadogPropagationDefaults.X_DD_PARENT_ID, ddSpanId);
+      setter.set(carrier, DatadogPropagationDefaults.X_DD_TRACE_ID, ddTraceId);
+      setter.set(carrier, DatadogPropagationDefaults.X_DD_PARENT_ID, ddSpanId);
 
       // Current Otel-DD exporter behavior in other languages is to set to zero if falsey
-      setter(
+      setter.set(
         carrier,
         DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY,
         (TraceFlags.SAMPLED & spanContext.traceFlags) === TraceFlags.SAMPLED
@@ -68,29 +66,31 @@ export class DatadogPropagator implements HttpTextPropagator {
         spanContext.traceState !== undefined &&
         spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
       ) {
-        setter(
+        const originString: string = spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN) || '';
+
+        setter.set(
           carrier,
           DatadogPropagationDefaults.X_DD_ORIGIN,
-          spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
+          originString
         );
       }
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const traceIdHeader = getter(
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    const traceIdHeader = getter.get(
       carrier,
       DatadogPropagationDefaults.X_DD_TRACE_ID
     );
-    const spanIdHeader = getter(
+    const spanIdHeader = getter.get(
       carrier,
       DatadogPropagationDefaults.X_DD_PARENT_ID
     );
-    const sampledHeader = getter(
+    const sampledHeader = getter.get(
       carrier,
       DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY
     );
-    const originHeader = getter(
+    const originHeader = getter.get(
       carrier,
       DatadogPropagationDefaults.X_DD_ORIGIN
     );
@@ -120,7 +120,7 @@ export class DatadogPropagator implements HttpTextPropagator {
     const spanId = id(spanIdHeaderValue, 10).toString('hex');
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
-      const contextOptions: SpanContext = {
+      const contextOptions: any = {
         traceId: traceId,
         spanId: spanId,
         isRemote: true,
@@ -132,8 +132,12 @@ export class DatadogPropagator implements HttpTextPropagator {
           `${DatadogDefaults.OT_ALLOWED_DD_ORIGIN}=${origin}`
         );
       }
-      return setExtractedSpanContext(context, contextOptions);
+      return setSpanContext(context, contextOptions);
     }
     return context;
+  }
+
+  fields(): string[] {
+    return [];
   }
 }
