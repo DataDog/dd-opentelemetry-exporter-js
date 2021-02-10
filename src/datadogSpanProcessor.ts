@@ -11,7 +11,12 @@ import {
   SpanExporter,
   ReadableSpan,
 } from '@opentelemetry/tracing';
-import { context, Logger, suppressInstrumentation, NoopLogger } from '@opentelemetry/api';
+import {
+  context,
+  Logger,
+  suppressInstrumentation,
+  NoopLogger,
+} from '@opentelemetry/api';
 import { id, DatadogBufferConfig } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;
@@ -70,7 +75,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
     if (this._isShutdown) {
       return this._shuttingDownPromise;
     }
-    this._isShutdown = true; 
+    this._isShutdown = true;
 
     this._shuttingDownPromise = new Promise((resolve, reject) => {
       Promise.resolve()

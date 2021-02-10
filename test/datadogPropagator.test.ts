@@ -12,12 +12,10 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   setSpanContext,
-  getSpanContext  
+  getSpanContext,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  TraceState
-} from '@opentelemetry/core';
+import { TraceState } from '@opentelemetry/core';
 import { DatadogPropagator } from '../src/';
 import { id } from '../src/types';
 import { DatadogPropagationDefaults } from '../src/defaults';
@@ -161,11 +159,7 @@ describe('DatadogPropagator', () => {
       carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
         getSpanContext(
-          datadogPropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -178,11 +172,7 @@ describe('DatadogPropagator', () => {
       carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
         getSpanContext(
-          datadogPropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -191,11 +181,7 @@ describe('DatadogPropagator', () => {
     it('returns undefined if datadog header is missing', () => {
       assert.deepStrictEqual(
         getSpanContext(
-          datadogPropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -205,11 +191,7 @@ describe('DatadogPropagator', () => {
       carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = 'invalid!';
       assert.deepStrictEqual(
         getSpanContext(
-          datadogPropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -236,28 +218,19 @@ describe('DatadogPropagator', () => {
     });
 
     it('should fail gracefully on bad responses from getter', () => {
-      const ctx1 = datadogPropagator.extract(
-        ROOT_CONTEXT,
-        carrier, {
-          // @ts-expect-error verify number is not allowed
-          get: (c, k) => 1, // not a number
-          keys: defaultTextMapGetter.keys,
-        }
-      );
-      const ctx2 = datadogPropagator.extract(
-        ROOT_CONTEXT,
-        carrier, {
-          get: (c, k) => [], // empty array
-          keys: defaultTextMapGetter.keys,
-        }
-      );
-      const ctx3 = datadogPropagator.extract(
-        ROOT_CONTEXT,
-        carrier, {
-          get: (c, k) => undefined, // missing value
-          keys: defaultTextMapGetter.keys,
-        }
-      );
+      const ctx1 = datadogPropagator.extract(ROOT_CONTEXT, carrier, {
+        // @ts-expect-error verify number is not allowed
+        get: (c, k) => 1, // not a number
+        keys: defaultTextMapGetter.keys,
+      });
+      const ctx2 = datadogPropagator.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => [], // empty array
+        keys: defaultTextMapGetter.keys,
+      });
+      const ctx3 = datadogPropagator.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => undefined, // missing value
+        keys: defaultTextMapGetter.keys,
+      });
 
       assert.ok(ctx1 === ROOT_CONTEXT);
       assert.ok(ctx2 === ROOT_CONTEXT);

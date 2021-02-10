@@ -20,7 +20,9 @@ function createSampledSpan(spanName: string, parent?: boolean): Span {
     sampler: DATADOG_ALWAYS_SAMPLER,
   }).getTracer('default');
   const span = parent
-    ? tracer.startSpan(spanName, {},
+    ? tracer.startSpan(
+        spanName,
+        {},
         setSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -50,7 +52,7 @@ describe('DatadogSpanProcessor', () => {
     sinon.restore();
   });
 
-  describe('constructor', () => {  
+  describe('constructor', () => {
     it('should create a DatadogSpanProcessor instance', () => {
       const processor = new DatadogSpanProcessor(exporter);
       assert.ok(processor instanceof DatadogSpanProcessor);
@@ -75,7 +77,7 @@ describe('DatadogSpanProcessor', () => {
     });
   });
 
-  describe('.onStart/.onEnd/.shutdown', () => {  
+  describe('.onStart/.onEnd/.shutdown', () => {
     it('should do nothing after processor is shutdown', () => {
       const processor = new DatadogSpanProcessor(
         exporter,
@@ -88,15 +90,15 @@ describe('DatadogSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(processor['_traces'].size, 1);
 
-      return processor.forceFlush().then( () => {
+      return processor.forceFlush().then(() => {
         assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
         processor.onStart(span);
         processor.onEnd(span);
         assert.strictEqual(processor['_traces'].size, 1);
-  
+
         assert.strictEqual(spy.args.length, 1);
-        return processor.shutdown().then( () => {
+        return processor.shutdown().then(() => {
           assert.strictEqual(spy.args.length, 2);
           assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -105,7 +107,7 @@ describe('DatadogSpanProcessor', () => {
           assert.strictEqual(spy.args.length, 2);
           assert.strictEqual(processor['_traces'].size, 0);
           assert.strictEqual(exporter.getFinishedSpans().length, 0);
-        });  
+        });
       });
     });
 
@@ -127,10 +129,10 @@ describe('DatadogSpanProcessor', () => {
       }
 
       //export all traces
-      return processor.forceFlush().then( () => {
+      return processor.forceFlush().then(() => {
         assert.strictEqual(exporter.getFinishedSpans().length, maxQueueSize);
- 
-        return processor.shutdown().then( () => {
+
+        return processor.shutdown().then(() => {
           assert.strictEqual(exporter.getFinishedSpans().length, 0);
         });
       });
@@ -154,10 +156,10 @@ describe('DatadogSpanProcessor', () => {
       }
 
       //export all traces
-      return processor.forceFlush().then( () => {
+      return processor.forceFlush().then(() => {
         assert.strictEqual(exporter.getFinishedSpans().length, maxTraceSize);
 
-        return processor.shutdown().then( () => {
+        return processor.shutdown().then(() => {
           assert.strictEqual(exporter.getFinishedSpans().length, 0);
         });
       });
@@ -174,7 +176,7 @@ describe('DatadogSpanProcessor', () => {
         processor.onEnd(span);
       }
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
-      return processor.forceFlush().then( () => {
+      return processor.forceFlush().then(() => {
         assert.strictEqual(
           exporter.getFinishedSpans().length,
           defaultProcessorConfig.maxQueueSize

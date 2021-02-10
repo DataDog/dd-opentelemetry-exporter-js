@@ -97,6 +97,6 @@ export class DatadogExporter implements SpanExporter {
         this._exporter._scheduler.stop();
       }
       resolve();
-    })
+    });
   }
 }

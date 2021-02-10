@@ -15,7 +15,7 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
-import { TraceState }from '@opentelemetry/core';
+import { TraceState } from '@opentelemetry/core';
 import { id } from './types';
 import { DatadogPropagationDefaults, DatadogDefaults } from './defaults';
 
@@ -66,7 +66,9 @@ export class DatadogPropagator implements TextMapPropagator {
         spanContext.traceState !== undefined &&
         spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
       ) {
-        const originString: string = spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN) || '';
+        const originString: string =
+          spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN) ||
+          '';
 
         setter.set(
           carrier,

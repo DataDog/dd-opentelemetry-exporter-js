@@ -5,11 +5,7 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import {
-  Sampler,
-  SamplingDecision,
-  SamplingResult
-} from '@opentelemetry/api';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces but records all traces. */
 export class DatadogProbabilitySampler implements Sampler {
