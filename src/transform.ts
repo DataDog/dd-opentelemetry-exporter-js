@@ -123,7 +123,8 @@ function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
     // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
     // the type and stacktrace are not officially recorded. Until this implemented,
     // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
-    const possibleType = inferErrorType(span);
+    const possibleType = inferErrorType(span) || 0;
+
     ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, DatadogDefaults.ERROR);
     ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
 
@@ -136,7 +137,8 @@ function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
     // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
     // the type and stacktrace are not officially recorded. Until this implemented,
     // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
-    const possibleType = inferErrorType(span);
+    const possibleType = inferErrorType(span) || 0;
+
     ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, 1);
     ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
 
@@ -292,8 +294,8 @@ function getSamplingRate(span: ReadableSpan): number {
 // hacky way to get a valid error type
 // get StatusCode key string
 // then check if `<library>.error_name` attribute exists
-function inferErrorType(span: ReadableSpan): unknown {
-  let typeName = undefined;
+function inferErrorType(span: ReadableSpan): number | undefined {
+  let typeName;
   for (const [key, value] of Object.entries(StatusCode)) {
     if (span.status.code === value) {
       typeName = key.toString();
@@ -302,13 +304,17 @@ function inferErrorType(span: ReadableSpan): unknown {
   }
 
   for (const [key, value] of Object.entries(span.attributes)) {
-    if (key.indexOf(DatadogDefaults.ERR_NAME_SUBSTRING) >= 0) {
-      typeName = value;
+    if (key.indexOf(DatadogDefaults.ERR_NAME_SUBSTRING) >= 0 && value) {
+      typeName = value.toString();
       break;
     }
   }
 
-  return typeName;
+  if (typeName) {
+    return parseInt(typeName);
+  } else {
+    return 0;
+  }
 }
 
 function isInternalRequest(span: ReadableSpan): boolean | void {
