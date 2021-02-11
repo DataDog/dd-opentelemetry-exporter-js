@@ -36,6 +36,9 @@ export enum DatadogDefaults {
   /** The datadog error type tag name */
   ERROR_TYPE_TAG = 'error.type',
 
+  /** A datadog error type's default value */
+  ERROR_TYPE_DEFAULT_VALUE = 'ERROR',
+
   /** The datadog error message tag name */
   ERROR_MSG_TAG = 'error.msg',
 

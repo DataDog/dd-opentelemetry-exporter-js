@@ -6,7 +6,7 @@
  */
 
 import * as assert from 'assert';
-import * as api from '@opentelemetry/api';
+import { StatusCode, SpanKind } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { id } from '../src/types';
@@ -146,17 +146,17 @@ describe('transform', () => {
       const spans = generateOtelSpans({
         spanContext: spanContextSampled,
         status: {
-          code: api.CanonicalCode.NOT_FOUND,
+          code: StatusCode.ERROR,
           message: 'error message',
         },
-        kind: api.SpanKind.CONSUMER,
+        kind: SpanKind.CONSUMER,
       });
       const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
 
       assert.strictEqual(datadogSpan.error, 1);
       assert.strictEqual(datadogSpan.meta['error.msg'], 'error message');
-      assert.strictEqual(datadogSpan.meta['error.type'], 'NOT_FOUND');
+      assert.strictEqual(datadogSpan.meta['error.type'], 'ERROR');
     });
 
     it('should set the sampling rate to -1 for internally generated traces', () => {

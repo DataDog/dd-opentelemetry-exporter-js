@@ -6,18 +6,16 @@
  */
 
 import {
-  defaultGetter,
-  defaultSetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   SpanContext,
   TraceFlags,
-  Context,
+  ROOT_CONTEXT,
+  setSpanContext,
+  getSpanContext,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  getExtractedSpanContext,
-  setExtractedSpanContext,
-  TraceState,
-} from '@opentelemetry/core';
+import { TraceState } from '@opentelemetry/core';
 import { DatadogPropagator } from '../src/';
 import { id } from '../src/types';
 import { DatadogPropagationDefaults } from '../src/defaults';
@@ -41,9 +39,9 @@ describe('DatadogPropagator', () => {
       };
 
       datadogPropagator.inject(
-        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[DatadogPropagationDefaults.X_DD_TRACE_ID],
@@ -71,9 +69,9 @@ describe('DatadogPropagator', () => {
       };
 
       datadogPropagator.inject(
-        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[DatadogPropagationDefaults.X_DD_TRACE_ID],
@@ -100,9 +98,9 @@ describe('DatadogPropagator', () => {
         traceFlags: TraceFlags.NONE,
       };
       datadogPropagator.inject(
-        setExtractedSpanContext(Context.ROOT_CONTEXT, emptySpanContext),
+        setSpanContext(ROOT_CONTEXT, emptySpanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[DatadogPropagationDefaults.X_DD_TRACE_ID],
@@ -123,8 +121,8 @@ describe('DatadogPropagator', () => {
       carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = id(
         'b7ad6b7169203331'
       ).toString(10);
-      const extractedSpanContext = getExtractedSpanContext(
-        datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      const extractedSpanContext = getSpanContext(
+        datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -144,8 +142,8 @@ describe('DatadogPropagator', () => {
       ).toString(10);
       carrier[DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY] = '1';
 
-      const extractedSpanContext = getExtractedSpanContext(
-        datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      const extractedSpanContext = getSpanContext(
+        datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -160,12 +158,8 @@ describe('DatadogPropagator', () => {
       carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = undefined;
       carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
-        getExtractedSpanContext(
-          datadogPropagator.extract(
-            Context.ROOT_CONTEXT,
-            carrier,
-            defaultGetter
-          )
+        getSpanContext(
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -177,12 +171,8 @@ describe('DatadogPropagator', () => {
       ).toString(10);
       carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
-        getExtractedSpanContext(
-          datadogPropagator.extract(
-            Context.ROOT_CONTEXT,
-            carrier,
-            defaultGetter
-          )
+        getSpanContext(
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -190,12 +180,8 @@ describe('DatadogPropagator', () => {
 
     it('returns undefined if datadog header is missing', () => {
       assert.deepStrictEqual(
-        getExtractedSpanContext(
-          datadogPropagator.extract(
-            Context.ROOT_CONTEXT,
-            carrier,
-            defaultGetter
-          )
+        getSpanContext(
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -204,12 +190,8 @@ describe('DatadogPropagator', () => {
     it('returns undefined if datadog header is invalid', () => {
       carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = 'invalid!';
       assert.deepStrictEqual(
-        getExtractedSpanContext(
-          datadogPropagator.extract(
-            Context.ROOT_CONTEXT,
-            carrier,
-            defaultGetter
-          )
+        getSpanContext(
+          datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -223,8 +205,8 @@ describe('DatadogPropagator', () => {
         'b7ad6b7169203331'
       ).toString(10);
       carrier[DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY] = '01';
-      const extractedSpanContext = getExtractedSpanContext(
-        datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      const extractedSpanContext = getSpanContext(
+        datadogPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -236,25 +218,23 @@ describe('DatadogPropagator', () => {
     });
 
     it('should fail gracefully on bad responses from getter', () => {
-      const ctx1 = datadogPropagator.extract(
-        Context.ROOT_CONTEXT,
-        carrier,
-        (c, k) => 1 // not a number
-      );
-      const ctx2 = datadogPropagator.extract(
-        Context.ROOT_CONTEXT,
-        carrier,
-        (c, k) => [] // empty array
-      );
-      const ctx3 = datadogPropagator.extract(
-        Context.ROOT_CONTEXT,
-        carrier,
-        (c, k) => undefined // missing value
-      );
+      const ctx1 = datadogPropagator.extract(ROOT_CONTEXT, carrier, {
+        // @ts-expect-error verify number is not allowed
+        get: (c, k) => 1, // not a number
+        keys: defaultTextMapGetter.keys,
+      });
+      const ctx2 = datadogPropagator.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => [], // empty array
+        keys: defaultTextMapGetter.keys,
+      });
+      const ctx3 = datadogPropagator.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => undefined, // missing value
+        keys: defaultTextMapGetter.keys,
+      });
 
-      assert.ok(ctx1 === Context.ROOT_CONTEXT);
-      assert.ok(ctx2 === Context.ROOT_CONTEXT);
-      assert.ok(ctx3 === Context.ROOT_CONTEXT);
+      assert.ok(ctx1 === ROOT_CONTEXT);
+      assert.ok(ctx2 === ROOT_CONTEXT);
+      assert.ok(ctx3 === ROOT_CONTEXT);
     });
 
     // TODO: this is implemented for b3 64 bit, not sure if we should implement for datadog
