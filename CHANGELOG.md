@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-02-11
+### Fixed
+- documentation updates
+
+### Added
+- support for opentelemetry-js v0.16.0
+- add resource attributes as span tags
+
 ## [0.1.2] - 2020-07-30
 ### Fixed
 - fix filtering of internal requests to trace agent
