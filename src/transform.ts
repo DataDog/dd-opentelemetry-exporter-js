@@ -118,32 +118,23 @@ function createSpan(
 }
 
 function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
-  if (span.status && span.status.code && span.status.code > 0) {
-    // TODO: set error.msg error.type error.stack based on error events
-    // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
-    // the type and stacktrace are not officially recorded. Until this implemented,
-    // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
-    const possibleType = inferErrorType(span) || 0;
-
+  // TODO: set error.msg error.type error.stack based on error events
+  // Determine if OpenTelemetry-JS has implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
+  // and if the type and stacktrace are officially recorded. Until this is done,
+  // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
+  if (span.status.code === StatusCode.ERROR) {
     ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, DatadogDefaults.ERROR);
     ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
+    ddSpanBase.setTag(
+      DatadogDefaults.ERROR_TYPE_TAG,
+      DatadogDefaults.ERROR_TYPE_DEFAULT_VALUE
+    );
 
-    if (possibleType && possibleType > 1) {
-      ddSpanBase.setTag(DatadogDefaults.ERROR_TYPE_TAG, possibleType);
-    }
-  }
-  if (span.status && span.status.code && span.status.code > 1) {
-    // TODO: set error.msg error.type error.stack based on error events
-    // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
-    // the type and stacktrace are not officially recorded. Until this implemented,
-    // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
-    const possibleType = inferErrorType(span) || 0;
-
-    ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, 1);
-    ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
-
-    if (possibleType) {
-      ddSpanBase.setTag(DatadogDefaults.ERROR_TYPE_TAG, possibleType);
+    for (const [key, value] of Object.entries(span.attributes)) {
+      if (key.indexOf(DatadogDefaults.ERR_NAME_SUBSTRING) >= 0 && value) {
+        ddSpanBase.setTag(DatadogDefaults.ERROR_TYPE_TAG, value.toString());
+        break;
+      }
     }
   }
 }
@@ -288,32 +279,6 @@ function getSamplingRate(span: ReadableSpan): number {
     return DatadogSamplingCodes.AUTO_KEEP;
   } else {
     return DatadogSamplingCodes.AUTO_REJECT;
-  }
-}
-
-// hacky way to get a valid error type
-// get StatusCode key string
-// then check if `<library>.error_name` attribute exists
-function inferErrorType(span: ReadableSpan): number | undefined {
-  let typeName;
-  for (const [key, value] of Object.entries(StatusCode)) {
-    if (span.status.code === value) {
-      typeName = key.toString();
-      break;
-    }
-  }
-
-  for (const [key, value] of Object.entries(span.attributes)) {
-    if (key.indexOf(DatadogDefaults.ERR_NAME_SUBSTRING) >= 0 && value) {
-      typeName = value.toString();
-      break;
-    }
-  }
-
-  if (typeName) {
-    return parseInt(typeName);
-  } else {
-    return 0;
   }
 }
 
