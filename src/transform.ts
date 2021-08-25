@@ -5,7 +5,7 @@
  * Copyright 2020 Datadog, Inc.
  */
 
-import { SpanKind, TraceFlags, StatusCode } from '@opentelemetry/api';
+import { SpanKind, TraceFlags, SpanStatusCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { id, format, Span, Sampler, NoopTracer } from './types';
@@ -122,7 +122,7 @@ function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
   // Determine if OpenTelemetry-JS has implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
   // and if the type and stacktrace are officially recorded. Until this is done,
   // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
-  if (span.status.code === StatusCode.ERROR) {
+  if (span.status.code === SpanStatusCode.ERROR) {
     ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, DatadogDefaults.ERROR);
     ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
     ddSpanBase.setTag(
@@ -201,8 +201,8 @@ function addDatadogTags(
 
 function getTraceContext(span: ReadableSpan): typeof Span[] {
   return [
-    id(span.spanContext.traceId),
-    id(span.spanContext.spanId),
+    id(span.spanContext().traceId),
+    id(span.spanContext().spanId),
     span.parentSpanId ? id(span.parentSpanId) : null,
   ];
 }
@@ -232,8 +232,8 @@ function createOriginString(span: ReadableSpan): string | undefined {
   // for some reason traceState keys must be w3c compliant and not stat with underscore
   // using dd_origin for internal tracestate and setting datadog tag as _dd_origin
   return (
-    span.spanContext.traceState &&
-    span.spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
+    span.spanContext().traceState &&
+    span.spanContext().traceState?.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
   );
 }
 
@@ -273,7 +273,7 @@ function getInstrumentationName(span: any): string | undefined {
 
 function getSamplingRate(span: ReadableSpan): number {
   if (
-    (TraceFlags.SAMPLED & span.spanContext.traceFlags) ===
+    (TraceFlags.SAMPLED & span.spanContext().traceFlags) ===
     TraceFlags.SAMPLED
   ) {
     return DatadogSamplingCodes.AUTO_KEEP;

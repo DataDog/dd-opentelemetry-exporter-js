@@ -124,7 +124,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
         this._tracesSpansFinished.delete(traceToDrop);
     }
 
-    const traceId = span.spanContext.traceId;
+    const traceId = span.spanContext().traceId;
 
     if (!this._traces.has(traceId)) {
       this._traces.set(traceId, []);
@@ -150,7 +150,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const traceId = span.spanContext.traceId;
+    const traceId = span.spanContext().traceId;
 
     if (!this._traces.has(traceId)) {
       return;
@@ -168,8 +168,8 @@ export class DatadogSpanProcessor implements SpanProcessor {
 
   getTraceContext(span: ReadableSpan): (string | undefined)[] {
     return [
-      id(span.spanContext.traceId),
-      id(span.spanContext.spanId),
+      id(span.spanContext().traceId),
+      id(span.spanContext().spanId),
       span.parentSpanId ? id(span.parentSpanId) : undefined,
     ];
   }
