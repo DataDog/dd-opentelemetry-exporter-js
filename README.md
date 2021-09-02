@@ -1,8 +1,10 @@
 # dd-opentelemetry-exporter-js
 
+*Note*: This Repository has been deprecated and is no longer actively maintained.  Please refer to [Datadog Documentation](https://docs.datadoghq.com/tracing/setup_overview/open_standards/) for support options for using OpenTelemetry and Datadog.
+
 ## OpenTelemetry Datadog Trace Exporter
 
-**[BETA]**
+**[DEPRECATED]**
 
 [![Apache License][license-image]][license-image]
 
