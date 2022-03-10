@@ -1,7 +1,7 @@
 {
   "name": "opentelemetry-exporter-datadog",
-  "version": "0.2.1",
-  "description": "[Deprecated] OpenTelemetry Exporter Datadog allows user to send collected traces to Datadog",
+  "version": "0.2.0",
+  "description": "OpenTelemetry Exporter Datadog allows user to send collected traces to Datadog",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "Datadog/dd-opentelemetry-exporter-js",

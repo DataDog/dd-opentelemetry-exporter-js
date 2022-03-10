@@ -1,9 +1,8 @@
 # Release History: opentelemetry-exporter-datadog
 
 ## [Unreleased]
-## [0.2.1] - 2020-03-10
-### Added
--  deprecate opentelemetry-exporter-datadog package
+### Fixed
+-  update link in deprecation note
 
 ## [0.2.0] - 2020-02-11
 ### Fixed
