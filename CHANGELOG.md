@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
--  deprecation note
+-  deprecate opentelemetry-exporter-datadog package
 
 ## [0.2.0] - 2020-02-11
 ### Fixed
